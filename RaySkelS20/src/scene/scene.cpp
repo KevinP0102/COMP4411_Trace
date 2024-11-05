@@ -111,6 +111,8 @@ bool Geometry::hasBoundingBoxCapability() const
 	// be checked against every single ray drawn.  This should be avoided whenever possible,
 	// but this possibility exists so that new primitives will not have to have bounding
 	// boxes implemented for them.
+
+
 	
 	return false;
 }
