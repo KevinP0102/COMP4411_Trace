@@ -8,7 +8,9 @@
 #include "scene/ray.h"
 #include "fileio/read.h"
 #include "fileio/parse.h"
+#include "ui/TraceUI.h"
 
+extern TraceUI* traceUI;
 // Trace a top-level ray through normalized window coordinates (x,y)
 // through the projection plane, and out into the scene.  All we do is
 // enter the main ray-tracing method, getting things started by plugging
@@ -26,6 +28,10 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 	const vec3f& thresh, int depth )
 {
 	isect i;
+	
+	if (depth > traceUI->getDepth()) {
+		return vec3f(0, 0, 0);
+	}
 
 	if( scene->intersect( r, i ) ) {
 		// YOUR CODE HERE
@@ -40,7 +46,22 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		// rays.
 
 		const Material& m = i.getMaterial();
-		return m.shade(scene, r, i);
+		vec3f I = m.shade(scene, r, i);
+
+		vec3f P = r.at(i.t);
+		vec3f N = i.N;
+		vec3f V = r.getDirection();
+
+		vec3f L = V - 2 * (N * V) * N;
+
+		ray reflectionRay(P, L);
+
+
+		vec3f reflectionColor = traceRay(scene, reflectionRay, thresh, depth + 1);
+		I = I + prod(reflectionColor, m.kr);
+
+
+		return I;
 	
 	} else {
 		// No intersection.  This ray travels to infinity, so we color
