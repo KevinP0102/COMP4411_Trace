@@ -32,6 +32,17 @@ public:
 
 	virtual vec3f shade( Scene *scene, const ray& r, const isect& i ) const;
 
+    static Material worldMaterial() {
+        return Material(vec3f(0,0,0), 
+            vec3f(0, 0, 0), 
+            vec3f(0, 0, 0), 
+            vec3f(0, 0, 0), 
+            vec3f(0, 0, 0), 
+            vec3f(1, 1, 1), 
+            0.0, 
+            1.0);
+    }
+
     vec3f ke;                    // emissive
     vec3f ka;                    // ambient
     vec3f ks;                    // specular

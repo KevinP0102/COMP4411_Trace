@@ -6,6 +6,8 @@
 #include "scene/scene.h"
 #include "scene/ray.h"
 
+#include <stack>
+
 class RayTracer
 {
 public:
@@ -13,7 +15,7 @@ public:
     ~RayTracer();
 
     vec3f trace( Scene *scene, double x, double y );
-	vec3f traceRay( Scene *scene, const ray& r, const vec3f& thresh, int depth );
+	vec3f traceRay( Scene *scene, const ray& r, const vec3f& thresh, int depth, stack<Material> materials );
 
 
 	void getBuffer( unsigned char *&buf, int &w, int &h );
@@ -25,6 +27,10 @@ public:
 	bool loadScene( char* fn );
 
 	bool sceneLoaded();
+
+	Scene* getScene() { return scene; }
+
+	vec3f calculateRefractedRay(vec3f i, vec3f n, double n1, double n2);
 
 private:
 	unsigned char *buffer;

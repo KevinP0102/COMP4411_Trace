@@ -19,13 +19,17 @@ vec3f RayTracer::trace( Scene *scene, double x, double y )
 {
     ray r( vec3f(0,0,0), vec3f(0,0,0) );
     scene->getCamera()->rayThrough( x,y,r );
-	return traceRay( scene, r, vec3f(1.0,1.0,1.0), 0 ).clamp();
+
+	stack<Material> materialStack = stack<Material>();
+	materialStack.push(Material::worldMaterial());
+
+	return traceRay( scene, r, vec3f(1.0,1.0,1.0), 0, materialStack).clamp();
 }
 
 // Do recursive ray tracing!  You'll want to insert a lot of code here
 // (or places called from here) to handle reflection, refraction, etc etc.
 vec3f RayTracer::traceRay( Scene *scene, const ray& r, 
-	const vec3f& thresh, int depth )
+	const vec3f& thresh, int depth, stack<Material> materials )
 {
 	isect i;
 	
@@ -52,14 +56,38 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		vec3f N = i.N;
 		vec3f V = r.getDirection();
 
+		if (&materials.top() == &m) {
+			N = -N;
+		}
+
 		vec3f L = V - 2 * (N * V) * N;
 
 		ray reflectionRay(P, L);
 
-
-		vec3f reflectionColor = traceRay(scene, reflectionRay, thresh, depth + 1);
+		vec3f reflectionColor = traceRay(scene, reflectionRay, thresh, depth + 1, materials);
 		I = I + prod(reflectionColor, m.kr);
 
+		//refraction
+		if (m.kt.length() > 0) {
+
+			double n1 = materials.top().index;
+			double n2;
+
+			if (&materials.top() == &m) { //inside
+				materials.pop();
+				n2 = materials.top().index;
+			}
+			else { //outside
+				materials.push(m);
+				n2 = m.index;
+			}
+
+			reflectionRay = ray(P, calculateRefractedRay(V, N, n1, n2));
+
+			vec3f refractionColor = traceRay(scene, reflectionRay, thresh, depth + 1, materials);
+			I = I + prod(refractionColor, m.kt);
+
+		}
 
 		return I;
 	
@@ -69,6 +97,41 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		// is just black.
 
 		return vec3f( 0.0, 0.0, 0.0 );
+	}
+}
+
+vec3f RayTracer::calculateRefractedRay(vec3f i, vec3f n, double n1, double n2) {
+	if (abs(abs(n * i) - 1) < RAY_EPSILON)
+		return i;
+
+	double sinAngleI = sqrt(1 - pow(n * i, 2));
+	double sinAngleT = (n1 / n2) * sinAngleI;
+
+	double angleI = asin(sinAngleI);
+	double angleT = asin(sinAngleT);
+
+	double sinDiff = sin(abs(angleI - angleT));
+	double d;
+
+	if (n1 == n2) {
+		return i;
+	}
+	else if (n1 > n2) {
+		double critical = n2 / n1;
+
+		if (critical - sinAngleI > RAY_EPSILON) {
+			double sinAlpha = sin(3.1416 - angleT);
+			d = sinAlpha / sinDiff;
+
+			return -(-i * d + (-n)).normalize();
+		}
+		else {
+			return vec3f(0.0, 0.0, 0.0);
+		}
+	}
+	else {
+		d = sinAngleT / sinDiff;
+		return (i * d + (-n)).normalize();
 	}
 }
 

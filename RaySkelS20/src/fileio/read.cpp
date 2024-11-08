@@ -549,7 +549,11 @@ static void processObject( Obj *obj, Scene *scene, mmap& materials )
 		processMaterial( child, &materials );
 	} else if( name == "camera" ) {
 		processCamera( child, scene );
-	} else {
+	}
+	else if (name == "ambient_light") {
+		scene->ambientLight = tupleToVec(getColorField(child));
+	}
+	else {
 		throw ParseError( string( "Unrecognized object: " ) + name );
 	}
 }

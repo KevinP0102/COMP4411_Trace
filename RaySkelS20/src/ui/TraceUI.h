@@ -28,6 +28,9 @@ public:
 
 	Fl_Slider*			m_sizeSlider;
 	Fl_Slider*			m_depthSlider;
+	Fl_Slider*			m_DistASlider;
+	Fl_Slider*			m_DistBSlider;
+	Fl_Slider*			m_DistCSlider;
 
 	Fl_Button*			m_renderButton;
 	Fl_Button*			m_stopButton;
@@ -41,12 +44,18 @@ public:
 
 	int			getSize();
 	int			getDepth();
+	double		getDistA();
+	double		getDistB();
+	double 		getDistC();
 
 private:
 	RayTracer*	raytracer;
 
 	int			m_nSize;
 	int			m_nDepth;
+	double		m_nDistA;
+	double		m_nDistB;
+	double		m_nDistC;
 
 // static class members
 	static Fl_Menu_Item menuitems[];
@@ -62,6 +71,9 @@ private:
 
 	static void cb_sizeSlides(Fl_Widget* o, void* v);
 	static void cb_depthSlides(Fl_Widget* o, void* v);
+	static void cb_DistASlides(Fl_Widget* o, void* v);
+	static void cb_DistBSlides(Fl_Widget* o, void* v);
+	static void cb_DistCSlides(Fl_Widget* o, void* v);
 
 	static void cb_render(Fl_Widget* o, void* v);
 	static void cb_stop(Fl_Widget* o, void* v);

@@ -249,6 +249,9 @@ public:
 
     TransformRoot transformRoot;
 
+	double distA = 0, distB = 0, distC = 0;
+	vec3f ambientLight = vec3f(0.1, 0.1, 0.1);
+
 public:
 	Scene() 
 		: transformRoot(), objects(), lights() {}

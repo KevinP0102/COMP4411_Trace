@@ -92,6 +92,21 @@ void TraceUI::cb_depthSlides(Fl_Widget* o, void* v)
 	((TraceUI*)(o->user_data()))->m_nDepth=int( ((Fl_Slider *)o)->value() ) ;
 }
 
+void TraceUI::cb_DistASlides(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_nDistA = double(((Fl_Slider*)o)->value());
+}
+
+void TraceUI::cb_DistBSlides(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_nDistB = double(((Fl_Slider*)o)->value());
+}
+
+void TraceUI::cb_DistCSlides(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_nDistC = double(((Fl_Slider*)o)->value());
+}
+
 void TraceUI::cb_render(Fl_Widget* o, void* v)
 {
 	char buffer[256];
@@ -195,6 +210,21 @@ int TraceUI::getDepth()
 	return m_nDepth;
 }
 
+double TraceUI::getDistA()
+{
+	return m_nDistA;
+}
+
+double TraceUI::getDistB()
+{
+	return m_nDistB;
+}
+
+double TraceUI::getDistC()
+{
+	return m_nDistC;
+}
+
 // menu definition
 Fl_Menu_Item TraceUI::menuitems[] = {
 	{ "&File",		0, 0, 0, FL_SUBMENU },
@@ -214,7 +244,7 @@ TraceUI::TraceUI() {
 	// init.
 	m_nDepth = 0;
 	m_nSize = 150;
-	m_mainWindow = new Fl_Window(100, 40, 320, 100, "Ray <Not Loaded>");
+	m_mainWindow = new Fl_Window(100, 40, 340, 200, "Ray <Not Loaded>");
 		m_mainWindow->user_data((void*)(this));	// record self to be used by static callback functions
 		// install menu bar
 		m_menubar = new Fl_Menu_Bar(0, 0, 320, 25);
@@ -245,6 +275,42 @@ TraceUI::TraceUI() {
 		m_sizeSlider->value(m_nSize);
 		m_sizeSlider->align(FL_ALIGN_RIGHT);
 		m_sizeSlider->callback(cb_sizeSlides);
+
+		m_DistASlider = new Fl_Value_Slider(10, 80, 180, 20, "Dist Attenuation A");
+		m_DistASlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_DistASlider->type(FL_HOR_NICE_SLIDER);
+		m_DistASlider->labelfont(FL_COURIER);
+		m_DistASlider->labelsize(12);
+		m_DistASlider->minimum(0);
+		m_DistASlider->maximum(1);
+		m_DistASlider->step(0.01);
+		m_DistASlider->value(0);
+		m_DistASlider->align(FL_ALIGN_RIGHT);
+		m_DistASlider->callback(cb_DistASlides);
+
+		m_DistBSlider = new Fl_Value_Slider(10, 105, 180, 20, "Dist Attenuation B");
+		m_DistBSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_DistBSlider->type(FL_HOR_NICE_SLIDER);
+		m_DistBSlider->labelfont(FL_COURIER);
+		m_DistBSlider->labelsize(12);
+		m_DistBSlider->minimum(0);
+		m_DistBSlider->maximum(1 * 0.1);
+		m_DistBSlider->step(0.01 * 0.1);
+		m_DistBSlider->value(0);
+		m_DistBSlider->align(FL_ALIGN_RIGHT);
+		m_DistBSlider->callback(cb_DistBSlides);
+
+		m_DistCSlider = new Fl_Value_Slider(10, 130, 180, 20, "Dist Attenuation C");
+		m_DistCSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_DistCSlider->type(FL_HOR_NICE_SLIDER);
+		m_DistCSlider->labelfont(FL_COURIER);
+		m_DistCSlider->labelsize(12);
+		m_DistCSlider->minimum(0);
+		m_DistCSlider->maximum(1 * 0.05);
+		m_DistCSlider->step(0.01 * 0.05);
+		m_DistCSlider->value(0);
+		m_DistCSlider->align(FL_ALIGN_RIGHT);
+		m_DistCSlider->callback(cb_DistCSlides);
 
 		m_renderButton = new Fl_Button(240, 27, 70, 25, "&Render");
 		m_renderButton->user_data((void*)(this));

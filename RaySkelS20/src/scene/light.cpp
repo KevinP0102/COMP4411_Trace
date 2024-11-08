@@ -1,6 +1,9 @@
 #include <cmath>
 
 #include "light.h"
+#include "../ui/TraceUI.h"
+
+extern TraceUI* traceUI;
 
 double DirectionalLight::distanceAttenuation( const vec3f& P ) const
 {
@@ -46,9 +49,9 @@ double PointLight::distanceAttenuation( const vec3f& P ) const
 	// of the light based on the distance between the source and the 
 	// point P.  For now, I assume no attenuation and just return 1.0
 	
-	double constantTerm = 0.25;
-	double linearTerm = 0.25;
-	double quadraticTerm = 0.50;
+	double constantTerm = traceUI->getDistA();
+	double linearTerm = traceUI->getDistB();
+	double quadraticTerm = traceUI->getDistC();
 
 	double distance = (position - P).length();
 	double attenuation = 1.0 / (constantTerm + linearTerm * distance + quadraticTerm * distance * distance);
