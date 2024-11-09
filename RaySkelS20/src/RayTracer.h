@@ -7,6 +7,7 @@
 #include "scene/ray.h"
 
 #include <stack>
+#include <random>
 
 class RayTracer
 {
@@ -39,6 +40,9 @@ private:
 	Scene *scene;
 
 	bool m_bSceneLoaded;
+
+	std::default_random_engine generator;
+	std::uniform_real_distribution<double> distribution;
 };
 
 #endif // __RAYTRACER_H__

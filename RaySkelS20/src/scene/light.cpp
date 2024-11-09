@@ -4,6 +4,7 @@
 #include "../ui/TraceUI.h"
 
 extern TraceUI* traceUI;
+extern std::vector<vec3f> distributedRays(vec3f ray, double radius, int count);
 
 double DirectionalLight::distanceAttenuation( const vec3f& P ) const
 {
@@ -17,15 +18,32 @@ vec3f DirectionalLight::shadowAttenuation( const vec3f& P ) const
     // YOUR CODE HERE:
     // You should implement shadow-handling code here.
 
+	bool softShadow = traceUI->getSoftShadow();
+
 	vec3f d = -orientation;
 	ray shadowRay(P, d);
 
 	vec3f c = color;
 	isect i;
 	if (scene->intersect(shadowRay, i)) {
-		c = i.getMaterial().kt;
+		c = prod(c, i.getMaterial().kt);
 	}
 
+	if (softShadow) {
+		std::vector<vec3f> samples;
+		samples = distributedRays(d, 0.01, 49);
+		for ( const vec3f& sample : samples ) {
+
+			ray shadowRay(P, sample);
+			isect i;
+			if (scene->intersect(shadowRay, i)) {
+				c += prod(color, i.getMaterial().kt);
+			} 
+			else c += color;
+
+		} 
+		c = c / (samples.size() + 1);
+	}
 
     return c;
 }
@@ -83,6 +101,7 @@ vec3f PointLight::shadowAttenuation(const vec3f& P) const
 {
     // YOUR CODE HERE:
     // You should implement shadow-handling code here.
+	bool softShadow = traceUI->getSoftShadow();
 
 	vec3f d = (position - P).normalize();
 	ray shadowRay(P, d);
@@ -91,8 +110,24 @@ vec3f PointLight::shadowAttenuation(const vec3f& P) const
 	isect i;
 	if (scene->intersect(shadowRay, i)) {
 		if ((shadowRay.at(i.t) - P).length() < (position - P).length()) {
-			c = i.getMaterial().kt;
+			c = prod(c, i.getMaterial().kt);
 		}
+	}
+
+	if (softShadow) {
+		std::vector<vec3f> samples;
+		samples = distributedRays(d, 0.025, 39);
+		for (const vec3f& sample : samples) {
+
+			ray shadowRay(P, sample);
+			isect i;
+			if (scene->intersect(shadowRay, i)) {
+				c += prod(color, i.getMaterial().kt);
+			}
+			else c += color;
+
+		}
+		c = c / (samples.size() + 1);
 	}
 
     return c;

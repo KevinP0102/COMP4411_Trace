@@ -13,6 +13,8 @@ public:
     void setLook( const vec3f &viewDir, const vec3f &upDir );
     void setFOV( double );
     void setAspectRatio( double );
+	void setAperture(double);
+	void setFocusDistance(double);
 
     double getAspectRatio() { return aspectRatio; }
 private:
@@ -25,6 +27,8 @@ private:
     vec3f eye;
     vec3f look;                  // direction to look
     vec3f u,v;                   // u and v in the 
+    double aperture;
+	double focusDistance;
 };
 
 #endif

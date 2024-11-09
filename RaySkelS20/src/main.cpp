@@ -67,6 +67,7 @@
 #include "RayTracer.h"
 
 #include "fileio/bitmap.h"
+#include <vector>
 
 // ***********************************************************
 // from getopt.cpp 
@@ -141,12 +142,41 @@ bool processArgs(int argc, char **argv) {
 	return true;
 }
 
+double frand() {
+	return (double)rand() / RAND_MAX;
+}
+
+std::vector<vec3f> distributedRays(vec3f ray, double radius, int count) {
+	vec3f up = vec3f(0, 1, 0);
+
+	if ((ray.normalize() - up).length() < RAY_EPSILON) {
+		up = vec3f(1, 0, 0);
+	}
+
+	vec3f right = ray.cross(up);
+	up = right.cross(ray);
+
+	std::vector<vec3f> rays;
+
+	for (int i = 0; i < count; i++) {
+		double x = frand() * radius * 2 - radius;
+		double y = frand() * radius * 2 - radius;
+
+		vec3f newRay = ray + right * x + up * y;
+
+		rays.push_back(newRay);
+	}
+
+	return rays;
+}
+
+
 // usage : ray [option] in.ray out.bmp
 // Simply keying in ray will invoke a graphics mode version.
 // Use "ray --help" to see the detailed usage.
 // OK. I am lying. any illegal option such as "ray blahbalh" will print
 // out the usage
-//
+
 // Graphics mode will be substantially slower than text mode because of
 // event handling overhead.
 int main(int argc, char **argv) {

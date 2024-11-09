@@ -1,4 +1,5 @@
 #include "camera.h"
+#include <random>
 
 #define PI 3.14159265359
 #define SHOW(x) (cerr << #x << " = " << (x) << "\n")
@@ -81,6 +82,16 @@ Camera::setAspectRatio( double ar )
 {
     aspectRatio = ar;
     update();
+}
+
+void Camera::setAperture(double aperture)
+{
+	this->aperture = aperture;
+}
+
+void Camera::setFocusDistance(double focusDistance)
+{
+	this->focusDistance = focusDistance;
 }
 
 void

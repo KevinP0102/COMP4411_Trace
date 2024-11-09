@@ -11,6 +11,8 @@
 #include "ui/TraceUI.h"
 
 extern TraceUI* traceUI;
+extern std::vector<vec3f> distributedRays(vec3f ray, double radius, int count);
+
 // Trace a top-level ray through normalized window coordinates (x,y)
 // through the projection plane, and out into the scene.  All we do is
 // enter the main ray-tracing method, getting things started by plugging
@@ -23,7 +25,34 @@ vec3f RayTracer::trace( Scene *scene, double x, double y )
 	stack<Material> materialStack = stack<Material>();
 	materialStack.push(Material::worldMaterial());
 
-	return traceRay( scene, r, vec3f(1.0,1.0,1.0), 0, materialStack).clamp();
+	vec3f color = traceRay( scene, r, vec3f(1.0,1.0,1.0), 0, materialStack).clamp();
+
+	if (traceUI->getMotionBlur()) {
+
+		vec3f ray = r.getDirection();
+		vec3f up = vec3f(0, 1, 0);
+
+		if ((ray.normalize() - up).length() < RAY_EPSILON) {
+			up = vec3f(1, 0, 0);
+		}
+
+		vec3f right = ray.cross(up);
+		up = right.cross(ray);
+
+		vec3f blur = ray;
+
+		for (int i = 0; i < 9; i++) {
+			blur += right * 0.003;
+			class::ray blurRay(r.getPosition(), blur.normalize());
+
+			color += traceRay(scene, blurRay, vec3f(1.0, 1.0, 1.0), 0, materialStack).clamp();
+		}
+
+		color = color / 10;
+
+	}
+
+	return color;
 }
 
 // Do recursive ray tracing!  You'll want to insert a lot of code here
@@ -66,10 +95,28 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 
 		vec3f L = V - 2 * (N * V) * N;
 
+		vec3f reflectionColor;
 		ray reflectionRay(P, L);
 
-		vec3f reflectionColor = traceRay(scene, reflectionRay, thresh, depth + 1, materials);
-		I = I + prod(reflectionColor, m.kr);
+		reflectionColor = 
+			prod(traceRay(scene, reflectionRay, thresh, depth + 1, materials), m.kr);
+
+		if (traceUI->getGlossyRefl()) {
+
+			std::vector<vec3f> rays = distributedRays(L, 0.02, 39);
+
+			for (const vec3f& r : rays) {
+				ray reflectionRay(P, r);
+				reflectionColor += 
+					prod(traceRay(scene, reflectionRay, thresh, max(depth+1, traceUI->getDepth()), materials), m.kr);
+			}
+
+			reflectionColor = reflectionColor / (rays.size()+1);
+		}
+
+		I = I + reflectionColor;
+
+
 
 		//refraction
 		if (m.kt.length() > 0) {
@@ -140,7 +187,7 @@ vec3f RayTracer::calculateRefractedRay(vec3f i, vec3f n, double n1, double n2) {
 	return (i * d + (-n)).normalize();
 }
 
-RayTracer::RayTracer()
+RayTracer::RayTracer() : distribution(0.0, 1.0)
 {
 	buffer = NULL;
 	buffer_width = buffer_height = 256;

@@ -33,6 +33,10 @@ public:
 	Fl_Slider*			m_DistCSlider;
 	Fl_Slider*			m_ThreshSlider;
 
+	Fl_Slider*			m_softShadowSlider;
+	Fl_Slider*			m_glossyReflSlider;	
+	Fl_Slider*			m_motionBlurSlider;
+
 	Fl_Button*			m_renderButton;
 	Fl_Button*			m_stopButton;
 
@@ -50,6 +54,10 @@ public:
 	double 		getDistC();
 	double		getThresh();
 
+	bool 	    getSoftShadow();
+	bool		getGlossyRefl();
+	bool		getMotionBlur();
+
 private:
 	RayTracer*	raytracer;
 
@@ -58,7 +66,11 @@ private:
 	double		m_nDistA = 0.25;
 	double		m_nDistB = 0.05;
 	double		m_nDistC = 0.025;
-	double		m_nThresh = 0.1;
+	double		m_nThresh = 0.05;
+
+	int			m_nSoftShadow = 0;
+	int			m_nGlossyRefl = 0;
+	int			m_nMotionBlur = 0;
 
 // static class members
 	static Fl_Menu_Item menuitems[];
@@ -78,6 +90,10 @@ private:
 	static void cb_DistBSlides(Fl_Widget* o, void* v);
 	static void cb_DistCSlides(Fl_Widget* o, void* v);
 	static void cb_ThreshSlides(Fl_Widget* o, void* v);
+
+	static void cb_softShadowSlides(Fl_Widget* o, void* v);
+	static void cb_glossyReflSlides(Fl_Widget* o, void* v);
+	static void cb_motionBlurSlides(Fl_Widget* o, void* v);
 
 	static void cb_render(Fl_Widget* o, void* v);
 	static void cb_stop(Fl_Widget* o, void* v);
