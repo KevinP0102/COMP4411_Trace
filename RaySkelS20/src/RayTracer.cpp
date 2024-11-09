@@ -52,6 +52,10 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		const Material& m = i.getMaterial();
 		vec3f I = m.shade(scene, r, i);
 
+		if (traceUI->getThresh() > I.length()) {
+			return I;
+		}
+
 		vec3f P = r.at(i.t);
 		vec3f N = i.N;
 		vec3f V = r.getDirection();
@@ -116,23 +120,24 @@ vec3f RayTracer::calculateRefractedRay(vec3f i, vec3f n, double n1, double n2) {
 	if (n1 == n2) {
 		return i;
 	}
-	else if (n1 > n2) {
+
+	if (n1 > n2) {
+
 		double critical = n2 / n1;
 
 		if (critical - sinAngleI > RAY_EPSILON) {
-			double sinAlpha = sin(3.1416 - angleT);
+
+			double sinAlpha = sin(3.14159 - angleT);
 			d = sinAlpha / sinDiff;
 
 			return -(-i * d + (-n)).normalize();
 		}
-		else {
-			return vec3f(0.0, 0.0, 0.0);
-		}
+
+		return vec3f(0.0, 0.0, 0.0); //total internal reflection
 	}
-	else {
-		d = sinAngleT / sinDiff;
-		return (i * d + (-n)).normalize();
-	}
+
+	d = sinAngleT / sinDiff;
+	return (i * d + (-n)).normalize();
 }
 
 RayTracer::RayTracer()

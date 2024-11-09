@@ -26,6 +26,14 @@ scale(0.2, 1.5, 1.5, sphere {
 	}
 } )
 
+scale(0.2, 1, 1, sphere {
+	material = { 
+		diffuse = (0.4, 0.4, 0);
+		transmissive = (0.7, 0.7, 0.7);
+		index = 2;
+	}
+} )
+
 // Add a couple of crossed cylinders behind the sphere to
 // see the refractive effect.
 translate( -2, -1, -10,

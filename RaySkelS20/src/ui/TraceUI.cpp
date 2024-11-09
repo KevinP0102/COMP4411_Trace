@@ -107,6 +107,11 @@ void TraceUI::cb_DistCSlides(Fl_Widget* o, void* v)
 	((TraceUI*)(o->user_data()))->m_nDistC = double(((Fl_Slider*)o)->value());
 }
 
+void TraceUI::cb_ThreshSlides(Fl_Widget* o, void* v)
+{
+	((TraceUI*)(o->user_data()))->m_nThresh = double(((Fl_Slider*)o)->value());
+}
+
 void TraceUI::cb_render(Fl_Widget* o, void* v)
 {
 	char buffer[256];
@@ -225,6 +230,11 @@ double TraceUI::getDistC()
 	return m_nDistC;
 }
 
+double TraceUI::getThresh()
+{
+	return m_nThresh;
+}
+
 // menu definition
 Fl_Menu_Item TraceUI::menuitems[] = {
 	{ "&File",		0, 0, 0, FL_SUBMENU },
@@ -284,7 +294,7 @@ TraceUI::TraceUI() {
 		m_DistASlider->minimum(0);
 		m_DistASlider->maximum(1);
 		m_DistASlider->step(0.01);
-		m_DistASlider->value(0);
+		m_DistASlider->value(m_nDistA);
 		m_DistASlider->align(FL_ALIGN_RIGHT);
 		m_DistASlider->callback(cb_DistASlides);
 
@@ -296,7 +306,7 @@ TraceUI::TraceUI() {
 		m_DistBSlider->minimum(0);
 		m_DistBSlider->maximum(1 * 0.1);
 		m_DistBSlider->step(0.01 * 0.1);
-		m_DistBSlider->value(0);
+		m_DistBSlider->value(m_nDistB);
 		m_DistBSlider->align(FL_ALIGN_RIGHT);
 		m_DistBSlider->callback(cb_DistBSlides);
 
@@ -308,9 +318,23 @@ TraceUI::TraceUI() {
 		m_DistCSlider->minimum(0);
 		m_DistCSlider->maximum(1 * 0.05);
 		m_DistCSlider->step(0.01 * 0.05);
-		m_DistCSlider->value(0);
+		m_DistCSlider->value(m_nDistC);
 		m_DistCSlider->align(FL_ALIGN_RIGHT);
 		m_DistCSlider->callback(cb_DistCSlides);
+
+		m_ThreshSlider = new Fl_Value_Slider(10, 155, 180, 20, "Threshold");
+		m_ThreshSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_ThreshSlider->type(FL_HOR_NICE_SLIDER);
+		m_ThreshSlider->labelfont(FL_COURIER);
+		m_ThreshSlider->labelsize(12);
+		m_ThreshSlider->minimum(0);
+		m_ThreshSlider->maximum(1);
+		m_ThreshSlider->step(0.01);
+		m_ThreshSlider->value(m_nThresh);
+		m_ThreshSlider->align(FL_ALIGN_RIGHT);
+		m_ThreshSlider->callback(cb_ThreshSlides);
+
+
 
 		m_renderButton = new Fl_Button(240, 27, 70, 25, "&Render");
 		m_renderButton->user_data((void*)(this));

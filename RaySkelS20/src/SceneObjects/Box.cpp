@@ -35,9 +35,6 @@ bool Box::intersectLocal( const ray& r, isect& i ) const
 
 	vec3f P = r.at(tMin);
 
-	i.N = vec3f(0, 0, 0);
-
-
 	//check all 6 sides of the box
 	if (abs(P[0] - -0.5) < RAY_EPSILON) {
 		i.N = vec3f(-1, 0, 0);
@@ -57,11 +54,6 @@ bool Box::intersectLocal( const ray& r, isect& i ) const
 	else if (abs(P[2] - 0.5) < RAY_EPSILON) {
 		i.N = vec3f(0, 0, 1);
 	}
-
-	//flip normal if necessary
-//	if (r.getDirection().dot(i.N) > 0) {
-//		i.N = -i.N;
-//	}
 
 	i.obj = this;
 
